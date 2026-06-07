@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 
 export function normalizeMessage(raw: string): string {
-  return raw
+  const normalized = raw
     .trim()
     // strip ISO timestamps
     .replace(/\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?/g, "")
@@ -22,12 +22,22 @@ export function normalizeMessage(raw: string): string {
     .replace(/\b\d+(\.\d+)?(ms|us|ns|s|kb|mb|gb|tb|b)\b/gi, "<n>$2")
     // replace numeric path segments in URLs/routes (e.g. /orders/303)
     .replace(/\/\d+/g, "/<n>")
+    // replace word-hyphen-number identifiers (e.g. thread-739, worker-12)
+    .replace(/\b([a-z][a-z0-9_]*)-\d+\b/gi, "$1-<n>")
+    // strip volatile location suffixes (e.g. "at position 787", "at line 42")
+    .replace(/\s+(?:at\s+)?(?:position|line|col(?:umn)?|offset|index)\s+\d+\b/gi, "")
     // replace large numbers (IDs, timestamps as numbers)
     .replace(/\b\d{4,}\b/g, "<n>")
     // collapse whitespace
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
+
+  // if message is "context: ExceptionClass", keep only the exception class
+  const exceptionMatch = normalized.match(/^.+:\s+([a-z][a-z0-9]*(?:exception|error|fault))$/);
+  if (exceptionMatch) return exceptionMatch[1];
+
+  return normalized;
 }
 
 export function fingerprintMessage(raw: string): { normalized: string; fingerprint: string } {
