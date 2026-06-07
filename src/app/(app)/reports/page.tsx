@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, RefreshCw } from "lucide-react";
+import { TriggerDigestButton } from "@/components/reports/trigger-digest-button";
 
 const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | "outline" | "success"> = {
   COMPLETED: "success",
@@ -20,7 +21,8 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  await auth();
+  const session = await auth();
+  const isAdmin = (session?.user as { role?: string })?.role === "ADMIN";
   const { page: pageStr } = await searchParams;
   const page = Math.max(1, parseInt(pageStr ?? "1", 10));
   const pageSize = 20;
@@ -46,6 +48,7 @@ export default async function ReportsPage({
           <h1 className="text-2xl font-bold tracking-tight">Daily Reports</h1>
           <p className="text-muted-foreground">View nightly error digests for all applications</p>
         </div>
+        {isAdmin && <TriggerDigestButton />}
       </div>
 
       <Card>
