@@ -56,49 +56,52 @@ export async function processAppEnv(config: FullConfig, reportId: string): Promi
 
   let newErrors = 0;
 
-  for (const [fingerprint, group] of groups) {
-    // upsert ErrorEntry — detect new vs recurring
-    const existing = await prisma.errorEntry.findUnique({
-      where: { appEnvConfigId_fingerprint: { appEnvConfigId: config.id, fingerprint } },
-    });
-
-    let errorEntryId: string;
-    const isNew = !existing;
-
-    if (!existing) {
-      const created = await prisma.errorEntry.create({
-        data: {
-          appEnvConfigId: config.id,
-          fingerprint,
-          normalizedMsg: group.normalized,
-          exampleRawMsg: group.example.slice(0, 2000),
-          firstSeenAt: group.minTs,
-          lastSeenAt: group.maxTs,
-        },
+  const entries = await Promise.all(
+    [...groups.entries()].map(async ([fingerprint, group]) => {
+      const existing = await prisma.errorEntry.findUnique({
+        where: { appEnvConfigId_fingerprint: { appEnvConfigId: config.id, fingerprint } },
       });
-      errorEntryId = created.id;
-      newErrors++;
-    } else {
-      await prisma.errorEntry.update({
-        where: { id: existing.id },
-        data: { lastSeenAt: group.maxTs, exampleRawMsg: group.example.slice(0, 2000) },
-      });
-      errorEntryId = existing.id;
-    }
 
-    // get AI hint
-    const aiHint = await getAiHint(group.normalized);
+      const isNew = !existing;
+      let errorEntryId: string;
 
-    await prisma.reportEntry.create({
-      data: {
-        reportId,
-        errorEntryId,
-        countInWindow: group.count,
-        isNew,
-        aiHint,
-      },
-    });
-  }
+      if (!existing) {
+        const created = await prisma.errorEntry.create({
+          data: {
+            appEnvConfigId: config.id,
+            fingerprint,
+            normalizedMsg: group.normalized,
+            exampleRawMsg: group.example.slice(0, 2000),
+            firstSeenAt: group.minTs,
+            lastSeenAt: group.maxTs,
+          },
+        });
+        errorEntryId = created.id;
+      } else {
+        await prisma.errorEntry.update({
+          where: { id: existing.id },
+          data: { lastSeenAt: group.maxTs, exampleRawMsg: group.example.slice(0, 2000) },
+        });
+        errorEntryId = existing.id;
+      }
+
+      const aiHint = await getAiHint(group.normalized);
+
+      return { errorEntryId, countInWindow: group.count, isNew, aiHint };
+    })
+  );
+
+  newErrors = entries.filter((e) => e.isNew).length;
+
+  await prisma.reportEntry.createMany({
+    data: entries.map((e) => ({
+      reportId,
+      errorEntryId: e.errorEntryId,
+      countInWindow: e.countInWindow,
+      isNew: e.isNew,
+      aiHint: e.aiHint,
+    })),
+  });
 
   return {
     errorCount: logLines.length,
