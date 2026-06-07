@@ -34,7 +34,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" size="icon">
-            <Link href="/app/reports"><ArrowLeft className="h-4 w-4" /></Link>
+            <Link href="/reports"><ArrowLeft className="h-4 w-4" /></Link>
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
@@ -48,7 +48,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
         <Button asChild variant="outline" className="gap-2">
-          <Link href={`/app/reports/${id}/pdf`} target="_blank">
+          <Link href={`/reports/${id}/pdf`} target="_blank">
             <Download className="h-4 w-4" />
             Export PDF
           </Link>

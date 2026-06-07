@@ -14,7 +14,7 @@ export default auth((req: NextAuthRequest) => {
     return NextResponse.next();
   }
 
-  if (!session && (pathname.startsWith("/app") || pathname.startsWith("/api/admin"))) {
+  if (!session && (pathname.startsWith("/reports") || pathname.startsWith("/admin") || pathname.startsWith("/api/admin"))) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -22,13 +22,13 @@ export default auth((req: NextAuthRequest) => {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  if (session?.user?.role !== "ADMIN" && pathname.startsWith("/app/admin")) {
-    return NextResponse.redirect(new URL("/app/reports", req.url));
+  if (session?.user?.role !== "ADMIN" && pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/reports", req.url));
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/app/:path*", "/api/admin/:path*", "/api/cron/:path*"],
+  matcher: ["/reports/:path*", "/admin/:path*", "/api/admin/:path*", "/api/cron/:path*"],
 };

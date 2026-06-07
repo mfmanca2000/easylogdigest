@@ -1,0 +1,5 @@
+DATABASE_URL="postgresql://easylogdigest:easylogdigest@localhost:5432/easylogdigest"
+AUTH_SECRET=""
+AUTH_URL="http://localhost:3000"
+ANTHROPIC_API_KEY="sk-ant-..."
+CRON_SECRET=""

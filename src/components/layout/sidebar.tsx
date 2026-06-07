@@ -24,14 +24,14 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Reports", href: "/app/reports", icon: <FileText className="h-4 w-4" /> },
-  { label: "Dashboard", href: "/app/admin", icon: <LayoutDashboard className="h-4 w-4" />, adminOnly: true },
-  { label: "Applications", href: "/app/admin/applications", icon: <Server className="h-4 w-4" />, adminOnly: true },
-  { label: "Environments", href: "/app/admin/environments", icon: <Globe className="h-4 w-4" />, adminOnly: true },
-  { label: "Datasources", href: "/app/admin/datasources", icon: <Database className="h-4 w-4" />, adminOnly: true },
-  { label: "App/Env Configs", href: "/app/admin/app-env-configs", icon: <Layers className="h-4 w-4" />, adminOnly: true },
-  { label: "Users", href: "/app/admin/users", icon: <Users className="h-4 w-4" />, adminOnly: true },
-  { label: "Settings", href: "/app/admin/settings", icon: <Settings className="h-4 w-4" />, adminOnly: true },
+  { label: "Reports", href: "/reports", icon: <FileText className="h-4 w-4" /> },
+  { label: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-4 w-4" />, adminOnly: true },
+  { label: "Applications", href: "/admin/applications", icon: <Server className="h-4 w-4" />, adminOnly: true },
+  { label: "Environments", href: "/admin/environments", icon: <Globe className="h-4 w-4" />, adminOnly: true },
+  { label: "Datasources", href: "/admin/datasources", icon: <Database className="h-4 w-4" />, adminOnly: true },
+  { label: "App/Env Configs", href: "/admin/app-env-configs", icon: <Layers className="h-4 w-4" />, adminOnly: true },
+  { label: "Users", href: "/admin/users", icon: <Users className="h-4 w-4" />, adminOnly: true },
+  { label: "Settings", href: "/admin/settings", icon: <Settings className="h-4 w-4" />, adminOnly: true },
 ];
 
 export function Sidebar({ role }: { role: string }) {
