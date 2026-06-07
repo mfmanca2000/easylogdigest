@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, RefreshCw, ChevronRight } from "lucide-react";
+import { FileText, RefreshCw, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { TriggerDigestButton } from "@/components/reports/trigger-digest-button";
 
 const STATUS_DOT: Record<string, string> = {
@@ -16,16 +16,42 @@ const STATUS_DOT: Record<string, string> = {
   PENDING: "bg-slate-400",
 };
 
+type SortKey = "date" | "application" | "environment" | "status" | "total" | "unique" | "new";
+type SortOrder = "asc" | "desc";
+
+const SORT_ORDER_BY: Record<SortKey, (order: SortOrder) => object> = {
+  date: (o) => ({ reportDate: o }),
+  application: (o) => ({ appEnvConfig: { application: { displayName: o } } }),
+  environment: (o) => ({ appEnvConfig: { environment: { name: o } } }),
+  status: (o) => ({ status: o }),
+  total: (o) => ({ errorCount: o }),
+  unique: (o) => ({ uniqueErrors: o }),
+  new: (o) => ({ newErrors: o }),
+};
+
+function sortUrl(col: SortKey, currentSort: SortKey, currentOrder: SortOrder, page: number) {
+  const nextOrder = currentSort === col && currentOrder === "asc" ? "desc" : "asc";
+  return `/reports?sort=${col}&order=${nextOrder}&page=${page}`;
+}
+
+function SortIcon({ col, currentSort, currentOrder }: { col: SortKey; currentSort: SortKey; currentOrder: SortOrder }) {
+  if (currentSort !== col) return <ChevronsUpDown className="size-3 opacity-40" />;
+  return currentOrder === "asc" ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />;
+}
+
 export default async function ReportsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string; order?: string }>;
 }) {
   const session = await auth();
   const isAdmin = (session?.user as { role?: string })?.role === "ADMIN";
-  const { page: pageStr } = await searchParams;
+  const { page: pageStr, sort: sortParam, order: orderParam } = await searchParams;
   const page = Math.max(1, parseInt(pageStr ?? "1", 10));
   const pageSize = 20;
+
+  const sort: SortKey = (sortParam as SortKey) in SORT_ORDER_BY ? (sortParam as SortKey) : "date";
+  const order: SortOrder = orderParam === "asc" ? "asc" : "desc";
 
   const [total, reports] = await Promise.all([
     prisma.dailyReport.count(),
@@ -33,7 +59,7 @@ export default async function ReportsPage({
       include: {
         appEnvConfig: { include: { application: true, environment: true } },
       },
-      orderBy: { reportDate: "desc" },
+      orderBy: SORT_ORDER_BY[sort](order),
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
@@ -78,13 +104,28 @@ export default async function ReportsPage({
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border hover:bg-transparent">
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pl-6">Date</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Application</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Environment</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground text-right">Total</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground text-right">Unique</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground text-right">New</TableHead>
+                  {(["date", "application", "environment", "status"] as SortKey[]).map((col, i) => (
+                    <TableHead key={col} className={i === 0 ? "pl-6" : ""}>
+                      <Link
+                        href={sortUrl(col, sort, order, page)}
+                        className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors w-fit"
+                      >
+                        {col.charAt(0).toUpperCase() + col.slice(1)}
+                        <SortIcon col={col} currentSort={sort} currentOrder={order} />
+                      </Link>
+                    </TableHead>
+                  ))}
+                  {(["total", "unique", "new"] as SortKey[]).map((col) => (
+                    <TableHead key={col} className="text-right">
+                      <Link
+                        href={sortUrl(col, sort, order, page)}
+                        className="flex items-center justify-end gap-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors ml-auto w-fit"
+                      >
+                        {col.charAt(0).toUpperCase() + col.slice(1)}
+                        <SortIcon col={col} currentSort={sort} currentOrder={order} />
+                      </Link>
+                    </TableHead>
+                  ))}
                   <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -145,12 +186,12 @@ export default async function ReportsPage({
               <div className="flex gap-2">
                 {page > 1 && (
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/reports?page=${page - 1}`}>Previous</Link>
+                    <Link href={`/reports?sort=${sort}&order=${order}&page=${page - 1}`}>Previous</Link>
                   </Button>
                 )}
                 {page < totalPages && (
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/reports?page=${page + 1}`}>Next</Link>
+                    <Link href={`/reports?sort=${sort}&order=${order}&page=${page + 1}`}>Next</Link>
                   </Button>
                 )}
               </div>
