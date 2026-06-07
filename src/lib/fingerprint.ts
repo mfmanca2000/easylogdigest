@@ -20,6 +20,8 @@ export function normalizeMessage(raw: string): string {
     .replace(/\b[0-9a-f]{16,}\b/gi, "<hex>")
     // replace numbers with units (e.g. 16430ms, 512kb)
     .replace(/\b\d+(\.\d+)?(ms|us|ns|s|kb|mb|gb|tb|b)\b/gi, "<n>$2")
+    // replace numeric path segments in URLs/routes (e.g. /orders/303)
+    .replace(/\/\d+/g, "/<n>")
     // replace large numbers (IDs, timestamps as numbers)
     .replace(/\b\d{4,}\b/g, "<n>")
     // collapse whitespace

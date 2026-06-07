@@ -58,20 +58,20 @@ export default function DatasourcesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Grafana Datasources</h1>
-          <p className="text-muted-foreground">Configure Grafana connections (Loki or Elasticsearch)</p>
+          <h1 className="text-xl font-bold text-foreground">Grafana Datasources</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Configure Grafana connections (Loki or Elasticsearch)</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate} className="gap-2"><Plus className="h-4 w-4" /> New Datasource</Button>
+            <Button onClick={openCreate} className="gap-2 shadow-sm"><Plus className="size-4" /> New Datasource</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>{editing ? "Edit Datasource" : "New Datasource"}</DialogTitle></DialogHeader>
             <div className="space-y-3 py-2">
-              <div className="space-y-1"><Label>Name</Label><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="production-loki" /></div>
-              <div className="space-y-1">
+              <div className="space-y-1.5"><Label>Name</Label><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="production-loki" className="h-9 rounded-lg" /></div>
+              <div className="space-y-1.5">
                 <Label>Type</Label>
                 <Select value={form.type} onValueChange={(v) => set("type", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -81,15 +81,15 @@ export default function DatasourcesPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1"><Label>Grafana Base URL</Label><Input value={form.baseUrl} onChange={(e) => set("baseUrl", e.target.value)} placeholder="https://grafana.example.com" /></div>
-              <div className="space-y-1"><Label>API Key / Token</Label><Input type="password" value={form.apiKey} onChange={(e) => set("apiKey", e.target.value)} placeholder="glc_..." /></div>
+              <div className="space-y-1.5"><Label>Grafana Base URL</Label><Input value={form.baseUrl} onChange={(e) => set("baseUrl", e.target.value)} placeholder="https://grafana.example.com" className="h-9 rounded-lg" /></div>
+              <div className="space-y-1.5"><Label>API Key / Token</Label><Input type="password" value={form.apiKey} onChange={(e) => set("apiKey", e.target.value)} placeholder="glc_…" className="h-9 rounded-lg" /></div>
               {form.type === "LOKI" && (
-                <div className="space-y-1"><Label>Loki Org ID (optional)</Label><Input value={form.lokiOrgId} onChange={(e) => set("lokiOrgId", e.target.value)} placeholder="1" /></div>
+                <div className="space-y-1.5"><Label>Loki Org ID (optional)</Label><Input value={form.lokiOrgId} onChange={(e) => set("lokiOrgId", e.target.value)} placeholder="1" className="h-9 rounded-lg" /></div>
               )}
               {form.type === "ELASTICSEARCH" && (<>
-                <div className="space-y-1"><Label>Index pattern</Label><Input value={form.esIndex} onChange={(e) => set("esIndex", e.target.value)} placeholder="logs-*" /></div>
-                <div className="space-y-1"><Label>Username (if not using API key)</Label><Input value={form.esUsername} onChange={(e) => set("esUsername", e.target.value)} /></div>
-                <div className="space-y-1"><Label>Password</Label><Input type="password" value={form.esPassword} onChange={(e) => set("esPassword", e.target.value)} /></div>
+                <div className="space-y-1.5"><Label>Index pattern</Label><Input value={form.esIndex} onChange={(e) => set("esIndex", e.target.value)} placeholder="logs-*" className="h-9 rounded-lg" /></div>
+                <div className="space-y-1.5"><Label>Username (if not using API key)</Label><Input value={form.esUsername} onChange={(e) => set("esUsername", e.target.value)} className="h-9 rounded-lg" /></div>
+                <div className="space-y-1.5"><Label>Password</Label><Input type="password" value={form.esPassword} onChange={(e) => set("esPassword", e.target.value)} className="h-9 rounded-lg" /></div>
               </>)}
               {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
@@ -101,29 +101,39 @@ export default function DatasourcesPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Datasources ({ds.length})</CardTitle></CardHeader>
-        <CardContent>
+      <Card className="ring-1 ring-foreground/10 shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-semibold">
+            Datasources
+            <span className="ml-2 rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-muted-foreground">{ds.length}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead>URL</TableHead><TableHead className="w-20"></TableHead></TableRow>
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="pl-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Type</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">URL</TableHead>
+                <TableHead className="w-20"></TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {ds.map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell className="font-medium">{d.name}</TableCell>
-                  <TableCell><Badge variant="outline">{d.type}</Badge></TableCell>
+                <TableRow key={d.id} className="border-b border-border/60 hover:bg-surface-50 transition-colors duration-100">
+                  <TableCell className="pl-6 font-medium text-sm">{d.name}</TableCell>
+                  <TableCell><Badge variant="outline" className="text-xs">{d.type}</Badge></TableCell>
                   <TableCell className="text-sm text-muted-foreground">{d.baseUrl}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(d)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => del(d.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(d)}><Pencil className="size-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => del(d.id)}><Trash2 className="size-4 text-destructive" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
               {ds.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">No datasources yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-10">No datasources yet</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

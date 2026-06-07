@@ -70,27 +70,27 @@ export default function AppEnvConfigsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">App / Env Configurations</h1>
-          <p className="text-muted-foreground">Configure which applications and environments to monitor</p>
+          <h1 className="text-xl font-bold text-foreground">App / Env Configurations</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Configure which applications and environments to monitor</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate} className="gap-2"><Plus className="h-4 w-4" /> New Config</Button>
+            <Button onClick={openCreate} className="gap-2 shadow-sm"><Plus className="size-4" /> New Config</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>{editing ? "Edit Config" : "New Config"}</DialogTitle></DialogHeader>
             <div className="space-y-3 py-2">
               {!editing && (<>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <Label>Application</Label>
                   <Select value={form.applicationId} onValueChange={(v) => set("applicationId", v)}>
                     <SelectTrigger><SelectValue placeholder="Select application" /></SelectTrigger>
                     <SelectContent>{apps.map((a) => <SelectItem key={a.id} value={a.id}>{a.displayName}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <Label>Environment</Label>
                   <Select value={form.environmentId} onValueChange={(v) => set("environmentId", v)}>
                     <SelectTrigger><SelectValue placeholder="Select environment" /></SelectTrigger>
@@ -98,21 +98,21 @@ export default function AppEnvConfigsPage() {
                   </Select>
                 </div>
               </>)}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label>Datasource</Label>
                 <Select value={form.datasourceId} onValueChange={(v) => set("datasourceId", v)}>
                   <SelectTrigger><SelectValue placeholder="Select datasource" /></SelectTrigger>
                   <SelectContent>{dsList.map((d) => <SelectItem key={d.id} value={d.id}>{d.name} ({d.type})</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label>Query template</Label>
                 <Textarea value={form.queryTemplate} onChange={(e) => set("queryTemplate", e.target.value)} rows={3} className="font-mono text-xs" />
                 <p className="text-xs text-muted-foreground">Use {"{app}"} and {"{env}"} as placeholders</p>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label>Lookback hours</Label>
-                <Input type="number" value={form.lookbackHours} onChange={(e) => set("lookbackHours", parseInt(e.target.value))} min={1} max={720} />
+                <Input type="number" value={form.lookbackHours} onChange={(e) => set("lookbackHours", parseInt(e.target.value))} min={1} max={720} className="h-9 rounded-lg" />
               </div>
               <div className="flex items-center gap-3">
                 <Switch checked={form.enabled} onCheckedChange={(v) => set("enabled", v)} id="enabled" />
@@ -128,33 +128,48 @@ export default function AppEnvConfigsPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Configurations ({configs.length})</CardTitle></CardHeader>
-        <CardContent>
+      <Card className="ring-1 ring-foreground/10 shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-semibold">
+            Configurations
+            <span className="ml-2 rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-muted-foreground">{configs.length}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow><TableHead>Application</TableHead><TableHead>Environment</TableHead><TableHead>Datasource</TableHead><TableHead>Lookback</TableHead><TableHead>Status</TableHead><TableHead className="w-20"></TableHead></TableRow>
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="pl-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Application</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Environment</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Datasource</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Lookback</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</TableHead>
+                <TableHead className="w-20"></TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {configs.map((c) => (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.application.displayName}</TableCell>
-                  <TableCell><Badge variant="outline">{c.environment.name}</Badge></TableCell>
+                <TableRow key={c.id} className="border-b border-border/60 hover:bg-surface-50 transition-colors duration-100">
+                  <TableCell className="pl-6 font-medium text-sm">{c.application.displayName}</TableCell>
+                  <TableCell><Badge variant="outline" className="text-xs">{c.environment.name}</Badge></TableCell>
                   <TableCell className="text-sm text-muted-foreground">{c.datasource.name}</TableCell>
                   <TableCell className="text-sm">{c.lookbackHours}h</TableCell>
                   <TableCell>
-                    {c.enabled ? <Badge variant="success">enabled</Badge> : <Badge variant="secondary">disabled</Badge>}
+                    {c.enabled
+                      ? <Badge variant="success" className="text-xs">enabled</Badge>
+                      : <Badge variant="secondary" className="text-xs">disabled</Badge>
+                    }
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(c)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => del(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(c)}><Pencil className="size-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => del(c.id)}><Trash2 className="size-4 text-destructive" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
               {configs.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No configurations yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-10">No configurations yet</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

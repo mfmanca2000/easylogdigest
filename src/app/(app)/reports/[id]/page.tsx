@@ -28,95 +28,109 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ i
 
   const recurring = report.uniqueErrors - report.newErrors;
 
+  const stats = [
+    { label: "Total errors", value: report.errorCount, icon: Activity, color: "text-foreground" },
+    { label: "Unique types", value: report.uniqueErrors, icon: AlertTriangle, color: "text-foreground" },
+    { label: "New errors", value: report.newErrors, icon: Zap, color: report.newErrors > 0 ? "text-destructive" : "text-foreground" },
+    { label: "Recurring", value: recurring, icon: RotateCcw, color: "text-foreground" },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon">
-            <Link href="/reports"><ArrowLeft className="h-4 w-4" /></Link>
+          <Button asChild variant="ghost" size="icon" className="size-8 shrink-0">
+            <Link href="/reports"><ArrowLeft className="size-4" /></Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              {report.appEnvConfig.application.displayName}
-              <span className="mx-2 text-muted-foreground">/</span>
-              {report.appEnvConfig.environment.name}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {format(report.reportDate, "MMMM d, yyyy")} · Generated {format(report.generatedAt, "HH:mm")} UTC
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl font-bold text-foreground">
+                {report.appEnvConfig.application.displayName}
+              </h1>
+              <span className="text-muted-foreground">/</span>
+              <Badge variant="outline" className="text-sm font-medium">
+                {report.appEnvConfig.environment.name}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {format(report.reportDate, "MMMM d, yyyy")} &middot; Generated at {format(report.generatedAt, "HH:mm")} UTC
             </p>
           </div>
         </div>
-        <Button asChild variant="outline" className="gap-2">
+        <Button asChild variant="outline" size="sm" className="shrink-0 gap-2">
           <Link href={`/reports/${id}/pdf`} target="_blank">
-            <Download className="h-4 w-4" />
+            <Download className="size-4" />
             Export PDF
           </Link>
         </Button>
       </div>
 
-      {/* Summary cards */}
+      {/* Stat cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1"><Activity className="h-3.5 w-3.5" /> Total errors</CardTitle></CardHeader>
-          <CardContent><p className="text-3xl font-bold">{report.errorCount}</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> Unique types</CardTitle></CardHeader>
-          <CardContent><p className="text-3xl font-bold">{report.uniqueErrors}</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1"><Zap className="h-3.5 w-3.5" /> New errors</CardTitle></CardHeader>
-          <CardContent>
-            <p className={`text-3xl font-bold ${report.newErrors > 0 ? "text-destructive" : ""}`}>{report.newErrors}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1"><RotateCcw className="h-3.5 w-3.5" /> Recurring</CardTitle></CardHeader>
-          <CardContent><p className="text-3xl font-bold">{recurring}</p></CardContent>
-        </Card>
+        {stats.map(({ label, value, icon: Icon, color }) => (
+          <Card key={label} className="ring-1 ring-foreground/10 shadow-sm">
+            <CardHeader className="pb-1 pt-4 px-5">
+              <CardTitle className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <Icon className="size-3.5" />
+                {label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-5 pb-4">
+              <p className={`text-3xl font-bold tabular-nums ${color}`}>{value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Error table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Error Details</CardTitle>
+      <Card className="ring-1 ring-foreground/10 shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-semibold">Error Details</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {report.reportEntries.length === 0 ? (
-            <p className="py-8 text-center text-muted-foreground">No errors found in this window.</p>
+            <p className="py-12 text-center text-sm text-muted-foreground">No errors found in this window.</p>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12 text-right">#</TableHead>
-                  <TableHead className="w-24">Status</TableHead>
-                  <TableHead className="w-28">First seen</TableHead>
-                  <TableHead>Error message</TableHead>
-                  <TableHead className="w-64">Investigation hint</TableHead>
+                <TableRow className="border-b border-border hover:bg-transparent">
+                  <TableHead className="w-16 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground pl-6">Count</TableHead>
+                  <TableHead className="w-24 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</TableHead>
+                  <TableHead className="w-28 text-xs font-semibold uppercase tracking-wide text-muted-foreground">First seen</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Error message</TableHead>
+                  <TableHead className="w-64 text-xs font-semibold uppercase tracking-wide text-muted-foreground">AI hint</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {report.reportEntries.map((entry: typeof report.reportEntries[0]) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="text-right font-bold tabular-nums">{entry.countInWindow}</TableCell>
+                  <TableRow
+                    key={entry.id}
+                    className="border-b border-border/60 hover:bg-surface-50 transition-colors duration-100"
+                  >
+                    <TableCell className="pl-6 text-right font-bold tabular-nums text-sm">
+                      {entry.countInWindow}
+                    </TableCell>
                     <TableCell>
                       {entry.isNew ? (
-                        <Badge variant="destructive">NEW</Badge>
+                        <Badge variant="destructive" className="text-xs">NEW</Badge>
                       ) : (
-                        <Badge variant="secondary">recurring</Badge>
+                        <Badge variant="secondary" className="text-xs">recurring</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                       {format(entry.errorEntry.firstSeenAt, "MMM d, yyyy")}
                     </TableCell>
                     <TableCell>
-                      <p className="font-mono text-xs break-all line-clamp-3" title={entry.errorEntry.normalizedMsg}>
+                      <p
+                        className="font-mono text-xs break-all line-clamp-3 text-foreground"
+                        title={entry.errorEntry.normalizedMsg}
+                      >
                         {entry.errorEntry.normalizedMsg}
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p className="text-xs text-muted-foreground italic">
+                      <p className="text-xs text-muted-foreground italic leading-relaxed">
                         {entry.aiHint ?? "—"}
                       </p>
                     </TableCell>

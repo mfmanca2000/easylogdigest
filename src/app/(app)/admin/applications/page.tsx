@@ -57,12 +57,12 @@ export default function ApplicationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Applications</h1>
-          <p className="text-muted-foreground">Manage monitored applications</p>
+          <h1 className="text-xl font-bold text-foreground">Applications</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage monitored applications</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate} className="gap-2"><Plus className="h-4 w-4" /> New Application</Button>
+            <Button onClick={openCreate} className="gap-2 shadow-sm"><Plus className="size-4" /> New Application</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>{editing ? "Edit Application" : "New Application"}</DialogTitle></DialogHeader>
@@ -85,32 +85,37 @@ export default function ApplicationsPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Applications ({apps.length})</CardTitle></CardHeader>
-        <CardContent>
+      <Card className="ring-1 ring-foreground/10 shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-semibold">
+            Applications
+            <span className="ml-2 rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-muted-foreground">{apps.length}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Display Name</TableHead>
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="pl-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Display Name</TableHead>
                 <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {apps.map((app) => (
-                <TableRow key={app.id}>
-                  <TableCell className="font-mono text-sm">{app.name}</TableCell>
-                  <TableCell>{app.displayName}</TableCell>
+                <TableRow key={app.id} className="border-b border-border/60 hover:bg-surface-50 transition-colors duration-100">
+                  <TableCell className="pl-6 font-mono text-sm">{app.name}</TableCell>
+                  <TableCell className="text-sm">{app.displayName}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(app)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => del(app.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(app)}><Pencil className="size-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => del(app.id)}><Trash2 className="size-4 text-destructive" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
               {apps.length === 0 && (
-                <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-8">No applications yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={3} className="text-center text-sm text-muted-foreground py-10">No applications yet</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

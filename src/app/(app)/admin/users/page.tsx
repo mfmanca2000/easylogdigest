@@ -53,25 +53,27 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Users</h1>
-          <p className="text-muted-foreground">Manage who can access EasyLogDigest</p>
+          <h1 className="text-xl font-bold text-foreground">Users</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage who can access EasyLogDigest</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate} className="gap-2"><Plus className="h-4 w-4" /> New User</Button>
+            <Button onClick={openCreate} className="gap-2 shadow-sm"><Plus className="size-4" /> New User</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>{editing ? "Edit User" : "New User"}</DialogTitle></DialogHeader>
             <div className="space-y-3 py-2">
-              {!editing && <div className="space-y-1"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} /></div>}
-              <div className="space-y-1"><Label>Name</Label><Input value={form.name} onChange={(e) => set("name", e.target.value)} /></div>
-              <div className="space-y-1">
+              {!editing && (
+                <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className="h-9 rounded-lg" /></div>
+              )}
+              <div className="space-y-1.5"><Label>Name</Label><Input value={form.name} onChange={(e) => set("name", e.target.value)} className="h-9 rounded-lg" /></div>
+              <div className="space-y-1.5">
                 <Label>{editing ? "New password (leave blank to keep)" : "Password"}</Label>
-                <Input type="password" value={form.password} onChange={(e) => set("password", e.target.value)} />
+                <Input type="password" value={form.password} onChange={(e) => set("password", e.target.value)} className="h-9 rounded-lg" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label>Role</Label>
                 <Select value={form.role} onValueChange={(v) => set("role", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -91,29 +93,41 @@ export default function UsersPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Users ({users.length})</CardTitle></CardHeader>
-        <CardContent>
+      <Card className="ring-1 ring-foreground/10 shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-semibold">
+            Users
+            <span className="ml-2 rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-muted-foreground">{users.length}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow><TableHead>Email</TableHead><TableHead>Name</TableHead><TableHead>Role</TableHead><TableHead className="w-20"></TableHead></TableRow>
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="pl-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Email</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Role</TableHead>
+                <TableHead className="w-20"></TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((u) => (
-                <TableRow key={u.id}>
-                  <TableCell>{u.email}</TableCell>
-                  <TableCell>{u.name ?? "—"}</TableCell>
-                  <TableCell><Badge variant={u.role === "ADMIN" ? "default" : "secondary"}>{u.role}</Badge></TableCell>
+                <TableRow key={u.id} className="border-b border-border/60 hover:bg-surface-50 transition-colors duration-100">
+                  <TableCell className="pl-6 text-sm">{u.email}</TableCell>
+                  <TableCell className="text-sm">{u.name ?? "—"}</TableCell>
+                  <TableCell>
+                    <Badge variant={u.role === "ADMIN" ? "default" : "secondary"} className="text-xs">{u.role}</Badge>
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(u)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => del(u.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(u)}><Pencil className="size-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => del(u.id)}><Trash2 className="size-4 text-destructive" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
               {users.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">No users</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-10">No users yet</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

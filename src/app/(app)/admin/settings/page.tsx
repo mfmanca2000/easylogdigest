@@ -42,8 +42,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Configure email dispatch and digest schedule</p>
+        <h1 className="text-xl font-bold text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Configure email dispatch and digest schedule</p>
       </div>
 
       <Tabs defaultValue="email">
@@ -53,8 +53,8 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="email">
-          <Card>
-            <CardHeader><CardTitle>SMTP / Email Configuration</CardTitle></CardHeader>
+          <Card className="ring-1 ring-foreground/10 shadow-sm">
+            <CardHeader className="border-b border-border pb-4"><CardTitle className="text-base font-semibold">SMTP / Email Configuration</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1"><Label>SMTP Host</Label><Input value={email.host} onChange={(e) => setE("host", e.target.value)} placeholder="smtp.example.com" /></div>
@@ -77,8 +77,8 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="schedule">
-          <Card>
-            <CardHeader><CardTitle>Digest Schedule</CardTitle></CardHeader>
+          <Card className="ring-1 ring-foreground/10 shadow-sm">
+            <CardHeader className="border-b border-border pb-4"><CardTitle className="text-base font-semibold">Digest Schedule</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
                 <Label>Cron expression (UTC)</Label>

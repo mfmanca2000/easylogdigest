@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Loader2 } from "lucide-react";
+import { Play, Loader2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function TriggerDigestButton() {
@@ -26,12 +26,21 @@ export function TriggerDigestButton() {
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <Button onClick={trigger} disabled={loading} size="sm">
-        {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
+    <div className="flex flex-col items-end gap-1.5">
+      <Button onClick={trigger} disabled={loading} size="sm" className="gap-2 shadow-sm">
+        {loading ? (
+          <Loader2 className="size-3.5 animate-spin" />
+        ) : (
+          <Play className="size-3.5" />
+        )}
         {loading ? "Running…" : "Run Digest Now"}
       </Button>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && (
+        <p className="flex items-center gap-1 text-xs text-destructive">
+          <AlertCircle className="size-3" />
+          {error}
+        </p>
+      )}
     </div>
   );
 }

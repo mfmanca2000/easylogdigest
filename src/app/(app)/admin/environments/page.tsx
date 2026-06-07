@@ -44,21 +44,21 @@ export default function EnvironmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Environments</h1>
-          <p className="text-muted-foreground">Manage deployment environments</p>
+          <h1 className="text-xl font-bold text-foreground">Environments</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage deployment environments</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate} className="gap-2"><Plus className="h-4 w-4" /> New Environment</Button>
+            <Button onClick={openCreate} className="gap-2 shadow-sm"><Plus className="size-4" /> New Environment</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>{editing ? "Edit Environment" : "New Environment"}</DialogTitle></DialogHeader>
             <div className="space-y-4 py-2">
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label>Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="production" />
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="production" className="h-9 rounded-lg" />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
@@ -70,27 +70,35 @@ export default function EnvironmentsPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Environments ({envs.length})</CardTitle></CardHeader>
-        <CardContent>
+      <Card className="ring-1 ring-foreground/10 shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <CardTitle className="text-base font-semibold">
+            Environments
+            <span className="ml-2 rounded-full bg-surface-100 px-2 py-0.5 text-xs font-medium text-muted-foreground">{envs.length}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow><TableHead>Name</TableHead><TableHead className="w-20"></TableHead></TableRow>
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="pl-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Name</TableHead>
+                <TableHead className="w-20"></TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {envs.map((e) => (
-                <TableRow key={e.id}>
-                  <TableCell className="font-mono">{e.name}</TableCell>
+                <TableRow key={e.id} className="border-b border-border/60 hover:bg-surface-50 transition-colors duration-100">
+                  <TableCell className="pl-6 font-mono text-sm">{e.name}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(e)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => del(e.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(e)}><Pencil className="size-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => del(e.id)}><Trash2 className="size-4 text-destructive" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
               {envs.length === 0 && (
-                <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground py-8">No environments yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={2} className="text-center text-sm text-muted-foreground py-10">No environments yet</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

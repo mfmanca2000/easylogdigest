@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,42 +37,62 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">EasyLogDigest</CardTitle>
-          <CardDescription>Sign in to view your daily error reports</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm space-y-6">
+        {/* Brand */}
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
+            <Activity className="size-6 text-white" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-foreground">EasyLogDigest</h1>
+            <p className="text-sm text-muted-foreground">Error log intelligence, delivered daily</p>
+          </div>
+        </div>
+
+        <Card className="ring-1 ring-foreground/10 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base font-semibold">Sign in</CardTitle>
+            <CardDescription>Enter your credentials to access reports</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-9 rounded-lg"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-9 rounded-lg"
+                  required
+                />
+              </div>
+              {error && (
+                <div className="flex items-center gap-2 rounded-lg bg-destructive/8 px-3 py-2 text-sm text-destructive">
+                  <AlertCircle className="size-4 shrink-0" />
+                  {error}
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in…" : "Sign in"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
