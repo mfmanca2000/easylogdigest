@@ -63,7 +63,7 @@ function buildEmailHtml(report: ReportPdfData): string {
         </tr>
       </table>
       <p>
-        <a href="${appUrl}/app/reports" style="display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-size: 14px;">
+        <a href="${appUrl}/reports" style="display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-size: 14px;">
           View full report online
         </a>
       </p>

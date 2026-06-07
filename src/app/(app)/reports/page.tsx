@@ -101,7 +101,7 @@ export default async function ReportsPage({
                     </TableCell>
                     <TableCell>
                       <Button asChild variant="ghost" size="sm">
-                        <Link href={`/app/reports/${r.id}`}>View</Link>
+                        <Link href={`/reports/${r.id}`}>View</Link>
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -118,12 +118,12 @@ export default async function ReportsPage({
               <div className="flex gap-2">
                 {page > 1 && (
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/app/reports?page=${page - 1}`}>Previous</Link>
+                    <Link href={`/reports?page=${page - 1}`}>Previous</Link>
                   </Button>
                 )}
                 {page < totalPages && (
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/app/reports?page=${page + 1}`}>Next</Link>
+                    <Link href={`/reports?page=${page + 1}`}>Next</Link>
                   </Button>
                 )}
               </div>
